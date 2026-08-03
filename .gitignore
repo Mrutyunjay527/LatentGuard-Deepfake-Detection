@@ -1,0 +1,23 @@
+# Virtual environments
+myvenv/
+venv/
+
+# VS Code
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Data
+data/
+
+# Outputs
+outputs/
+
+# Hugging Face cache
+.cache/
+
+# OS files
+.DS_Store
+Thumbs.db
