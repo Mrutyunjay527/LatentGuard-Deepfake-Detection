@@ -9,7 +9,8 @@ from sklearn.metrics import (
     classification_report
 )
 
-from config import *
+# from config import *
+from config_cross_dataset import *
 from src.dataset import ImageDataset
 from src.transforms import val_transform
 
