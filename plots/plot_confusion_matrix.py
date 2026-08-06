@@ -30,7 +30,7 @@ plt.title("Confusion Matrix - LatentGuard")
 plt.tight_layout()
 
 plt.savefig(
-    "outputs/confusion_matrix.png",
+    "plots/confusion_matrix.png",
     dpi=300,
      bbox_inches="tight"
 )
