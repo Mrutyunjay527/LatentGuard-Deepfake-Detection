@@ -28,9 +28,7 @@ def test():
 
     print(f"Using Device : {DEVICE}")
 
-    # -----------------------------
     # Load Dataset
-    # -----------------------------
     test_dataset = ImageDataset(
         TEST_DIR,
         transform=val_transform
@@ -46,9 +44,8 @@ def test():
         pin_memory=True
     )
 
-    # -----------------------------
+    
     # Build Model
-    # -----------------------------
     image_encoder = ImageEncoder().to(DEVICE)
     vae_encoder = VAEEncoder().to(DEVICE)
 
@@ -68,11 +65,10 @@ def test():
 
     print("Model Loaded Successfully!")
 
-    # -----------------------------
     # Evaluation
-    # -----------------------------
+    
     predictions = []
-    labels_list = []
+    labels_list = []                   
     probabilities = []
 
     with torch.no_grad():
@@ -100,9 +96,8 @@ def test():
                 labels.cpu().numpy()
             )
 
-    # -----------------------------
+    
     # Metrics
-    # -----------------------------
     accuracy = accuracy_score(labels_list, predictions)
     precision = precision_score(labels_list, predictions)
     recall = recall_score(labels_list, predictions)
@@ -115,9 +110,8 @@ def test():
         predictions
     )
 
-    # -----------------------------
+    
     # ROC
-    # -----------------------------
     fpr, tpr, _ = roc_curve(
         labels_list,
         probabilities
@@ -125,9 +119,7 @@ def test():
 
     roc_auc = auc(fpr, tpr)
 
-    # -----------------------------
     # Display
-    # -----------------------------
     print("=" * 50)
     print("LATENTGUARD TEST RESULTS")
     print("=" * 50)
@@ -144,9 +136,8 @@ def test():
     print("\nClassification Report")
     print(report)
 
-    # -----------------------------
+
     # Save Results
-    # -----------------------------
     with open("outputs/test_results.txt", "w") as f:
 
         f.write("LATENTGUARD TEST RESULTS\n")
@@ -167,9 +158,8 @@ def test():
 
     print("Results saved successfully!")
 
-    # -----------------------------
+
     # Confusion Matrix Plot
-    # -----------------------------
     plt.figure(figsize=(6,5))
 
     sns.heatmap(
@@ -194,9 +184,7 @@ def test():
 
     plt.close()
 
-    # -----------------------------
     # ROC Curve
-    # -----------------------------
     plt.figure(figsize=(7,6))
 
     plt.plot(
