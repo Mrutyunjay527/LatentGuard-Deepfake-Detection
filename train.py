@@ -9,7 +9,8 @@ from config import *
 
 # Dataset
 from src.dataset import ImageDataset
-from src.transforms import train_transform, val_transform
+# from src.transforms import train_transform, val_transform
+from src.transforms_robust import train_transform_robust, val_transform_robust
 
 # Encoders
 from models.image_encoder import ImageEncoder
@@ -36,12 +37,14 @@ def train():
     # Dataset
     train_dataset = ImageDataset(
         TRAIN_DIR,
-        transform=train_transform
+        # transform=train_transform
+        transform=train_transform_robust
     )
 
     val_dataset = ImageDataset(
         VAL_DIR,
-        transform=val_transform
+        # transform=val_transform
+        transform=val_transform_robust
     )
     
 

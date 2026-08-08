@@ -28,4 +28,5 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Output
 os.makedirs("outputs", exist_ok=True)
-MODEL_SAVE_PATH = "outputs/latentguard_best.pth"
+# MODEL_SAVE_PATH = "outputs/latentguard_best.pth"
+MODEL_SAVE_PATH = "outputs/latentguard_robust.pth"

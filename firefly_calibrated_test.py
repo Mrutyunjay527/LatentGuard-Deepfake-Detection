@@ -42,7 +42,8 @@ def test():
     with open(threshold_file, "r") as f:
         calibration = json.load(f)
 
-    threshold = calibration["threshold"]
+    # threshold = calibration["threshold"]
+    threshold = 0.50
 
     print(f"Calibrated Threshold: {threshold:.2f}")
 

@@ -155,6 +155,7 @@ def analyze_errors():
 
     real_as_fake = 0
     fake_as_real = 0
+    THRESHOLD = 0.55
 
    
     # Evaluation
@@ -175,10 +176,11 @@ def analyze_errors():
                 dim=1
             )
 
-            predictions = torch.argmax(
-                outputs,
-                dim=1
-            )
+            fake_probabilities = probabilities[:, 1]
+
+            predictions = (
+                fake_probabilities >= THRESHOLD
+            ).long()
 
             for i in range(len(images)):
 
