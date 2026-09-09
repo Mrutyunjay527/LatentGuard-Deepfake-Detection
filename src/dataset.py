@@ -24,7 +24,7 @@ class ImageDataset(Dataset):
             for image_name in os.listdir(folder_path):
 
                 image_path = os.path.join(folder_path, image_name)
-
+    
                 self.images.append((image_path, label))
 
     def __len__(self):

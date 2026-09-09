@@ -11,7 +11,7 @@ IMAGE_SIZE = 224
 
 # Training Settings
 BATCH_SIZE = 4
-EPOCHS = 2
+EPOCHS = 20
 LEARNING_RATE = 1e-4
 
 # DataLoader
@@ -27,6 +27,32 @@ NUM_CLASSES = 2
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Output
-os.makedirs("outputs", exist_ok=True)
-# MODEL_SAVE_PATH = "outputs/latentguard_best.pth"
-MODEL_SAVE_PATH = "outputs/latentguard_robust.pth"
+# os.makedirs("outputs", exist_ok=True)
+# # MODEL_SAVE_PATH = "outputs/latentguard_best.pth"
+# MODEL_SAVE_PATH = "outputs/latentguard_robust.pth"
+
+# Output Directories
+OUTPUT_DIR = "outputs"
+
+CHECKPOINT_DIR = os.path.join(
+    OUTPUT_DIR,
+    "checkpoints"
+)
+
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs(CHECKPOINT_DIR, exist_ok=True)
+
+
+# Best Model Path
+MODEL_SAVE_PATH = os.path.join(
+    OUTPUT_DIR,
+    "latentguard_20epoch_best.pth"
+)
+
+
+# Latest Checkpoint Path
+LATEST_CHECKPOINT_PATH = os.path.join(
+    OUTPUT_DIR,
+    "latest_checkpoint.pth"
+)
+
