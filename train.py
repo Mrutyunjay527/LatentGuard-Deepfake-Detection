@@ -28,7 +28,6 @@ from models.latent_guard import LatentGuard
 
 
 # SET RANDOM SEED
-
 random.seed(SEED)
 np.random.seed(SEED)
 torch.manual_seed(SEED)

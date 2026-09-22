@@ -1,4 +1,3 @@
-import os
 import torch
 from torch.utils.data import DataLoader
 
@@ -14,71 +13,68 @@ from sklearn.metrics import (
 
 from config import *
 
-# Dataset
 from src.dataset import ImageDataset
 from src.transforms import val_transform
 
-# Models
 from models.image_encoder import ImageEncoder
 from models.vae_encoder import VAEEncoder
 from models.latent_guard import LatentGuard
 
 
-def test():
+# --------------------------------------------------
+# FIREfly UNSEEN-GENERATOR TEST
+# --------------------------------------------------
+
+FIREFLY_DIR = "data/FireFly_test"
+
+
+def test_firefly():
 
     print("=" * 60)
-    print("LATENTGUARD 20-EPOCH TEST EVALUATION")
+    print("LATENTGUARD - FIREFLY UNSEEN GENERATOR TEST")
     print("=" * 60)
 
-    print(f"Using Device : {DEVICE}")
-    print(f"Model        : {MODEL_SAVE_PATH}")
-    print(f"Test Dataset : {TEST_DIR}")
+    print(f"\nUsing Device : {DEVICE}")
 
-    # ---------------------------------------------------------
-    # LOAD TEST DATASET
-    # ---------------------------------------------------------
+    # -----------------------------------------------
+    # Load Firefly Dataset
+    # -----------------------------------------------
 
-    test_dataset = ImageDataset(
-        TEST_DIR,
+    firefly_dataset = ImageDataset(
+        FIREFLY_DIR,
         transform=val_transform
     )
 
-    print(f"\nTesting Images : {len(test_dataset)}")
+    print("Firefly Images :", len(firefly_dataset))
 
-    test_loader = DataLoader(
-        test_dataset,
+    firefly_loader = DataLoader(
+        firefly_dataset,
         batch_size=BATCH_SIZE,
         shuffle=False,
         num_workers=NUM_WORKERS,
         pin_memory=True
     )
 
-    # ---------------------------------------------------------
-    # BUILD MODEL
-    # ---------------------------------------------------------
+    # -----------------------------------------------
+    # Load Encoders
+    # -----------------------------------------------
 
     print("\nLoading Image Encoder...")
     image_encoder = ImageEncoder().to(DEVICE)
-    image_encoder.eval()
 
     print("Loading VAE Encoder...")
     vae_encoder = VAEEncoder().to(DEVICE)
-    vae_encoder.eval()
 
-    print("Loading LatentGuard...")
+    # -----------------------------------------------
+    # Load LatentGuard
+    # -----------------------------------------------
+
+    print("Loading LatentGuard Model...")
+
     model = LatentGuard(
         image_encoder=image_encoder,
         vae_encoder=vae_encoder
     ).to(DEVICE)
-
-    # ---------------------------------------------------------
-    # LOAD 20-EPOCH BEST MODEL
-    # ---------------------------------------------------------
-
-    if not os.path.exists(MODEL_SAVE_PATH):
-        raise FileNotFoundError(
-            f"\nModel not found:\n{MODEL_SAVE_PATH}"
-        )
 
     model.load_state_dict(
         torch.load(
@@ -89,41 +85,30 @@ def test():
 
     model.eval()
 
-    print("\n20-Epoch Best Model Loaded Successfully!")
+    print("Model Loaded Successfully!")
 
-    # ---------------------------------------------------------
-    # EVALUATION
-    # ---------------------------------------------------------
+    # -----------------------------------------------
+    # Evaluation
+    # -----------------------------------------------
 
     predictions = []
     labels_list = []
     probabilities = []
 
-    print("\nEvaluating Test Dataset...\n")
+    print("\nEvaluating Firefly images...\n")
 
     with torch.no_grad():
 
-        for batch_idx, (images, labels) in enumerate(test_loader):
-
-            if batch_idx % 100 == 0:
-                print(
-                    f"Batch {batch_idx}/{len(test_loader)}"
-                )
+        for images, labels in firefly_loader:
 
             images = images.to(DEVICE)
             labels = labels.to(DEVICE)
 
             outputs = model(images)
 
-            probabilities_batch = torch.softmax(
-                outputs,
-                dim=1
-            )
+            probs = torch.softmax(outputs, dim=1)
 
-            _, predicted = torch.max(
-                outputs,
-                1
-            )
+            _, predicted = torch.max(outputs, 1)
 
             predictions.extend(
                 predicted.cpu().numpy()
@@ -134,14 +119,12 @@ def test():
             )
 
             probabilities.extend(
-                probabilities_batch[:, 1]
-                .cpu()
-                .numpy()
+                probs[:, 1].cpu().numpy()
             )
 
-    # ---------------------------------------------------------
-    # METRICS
-    # ---------------------------------------------------------
+    # -----------------------------------------------
+    # Metrics
+    # -----------------------------------------------
 
     accuracy = accuracy_score(
         labels_list,
@@ -182,13 +165,12 @@ def test():
         zero_division=0
     )
 
-    # ---------------------------------------------------------
-    # DISPLAY RESULTS
-    # ---------------------------------------------------------
+    # -----------------------------------------------
+    # Print Results
+    # -----------------------------------------------
 
-    print("\n")
     print("=" * 60)
-    print("LATENTGUARD 20-EPOCH TEST RESULTS")
+    print("LATENTGUARD FIREFLY RESULTS")
     print("=" * 60)
 
     print(f"Accuracy : {accuracy:.4f}")
@@ -203,29 +185,20 @@ def test():
     print("\nClassification Report")
     print(report)
 
-    # ---------------------------------------------------------
-    # SAVE RESULTS
-    # ---------------------------------------------------------
+    # -----------------------------------------------
+    # Save Results
+    # -----------------------------------------------
 
-    results_path = (
-        "outputs/test_results_20epoch.txt"
-    )
-
-    with open(results_path, "w") as f:
+    with open(
+        "outputs/firefly_test_results.txt",
+        "w"
+    ) as f:
 
         f.write(
-            "LATENTGUARD 20-EPOCH TEST RESULTS\n"
+            "LATENTGUARD FIREFLY UNSEEN GENERATOR RESULTS\n"
         )
 
         f.write("=" * 50 + "\n\n")
-
-        f.write(
-            f"Model: {MODEL_SAVE_PATH}\n"
-        )
-
-        f.write(
-            f"Test Dataset: {TEST_DIR}\n\n"
-        )
 
         f.write(
             f"Accuracy : {accuracy:.4f}\n"
@@ -247,30 +220,17 @@ def test():
             f"ROC AUC  : {roc_auc:.4f}\n\n"
         )
 
-        f.write(
-            "Confusion Matrix\n"
-        )
+        f.write("Confusion Matrix\n")
+        f.write(str(cm))
 
-        f.write(
-            str(cm)
-        )
-
-        f.write("\n\n")
-
-        f.write(
-            "Classification Report\n"
-        )
-
-        f.write(
-            report
-        )
+        f.write("\n\nClassification Report\n")
+        f.write(report)
 
     print(
-        f"\nResults saved to: {results_path}"
+        "\nResults saved to "
+        "outputs/firefly_test_results.txt"
     )
-
-    print("\nTest evaluation completed successfully!")
 
 
 if __name__ == "__main__":
-    test()
+    test_firefly()
